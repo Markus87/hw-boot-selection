@@ -33,7 +33,9 @@ static void init_gpio(void)
 
     #if defined(STM32F1)
         // STM32 F1
-        gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT		, GPIO_CNF_INPUT_PULL_UPDOWN	, GPIO6		);
+	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ	, GPIO_CNF_OUTPUT_PUSHPULL	, GPIO4 | GPIO2 );
+	gpio_clear( GPIOA, GPIO4 | GPIO2 );
         gpio_set(GPIOA, GPIO6); // Enable internal pull-up
     #else
         // STM32 F0, F2, F3, F4
@@ -59,5 +61,17 @@ int main(void)
         // This can be done with interrupts, but the implementation differs
         // across devices so we're keeping this simple here.
         usbd_poll(usbd_dev);
+	
+	// Set outputs depending on switch position	
+	if( read_switch_value() == '1' )
+	{
+		gpio_clear	( GPIOA, GPIO2 );
+		gpio_set	( GPIOA, GPIO4 );
+	}
+	else
+	{
+		gpio_set        ( GPIOA, GPIO2 );
+		gpio_clear	( GPIOA, GPIO4 );
+	}	
     }
 }
